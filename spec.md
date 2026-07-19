@@ -25,8 +25,9 @@ tests/      vitest: APIコントラクト + プロキシのコア + データ整
 - **単一オリジン**: CORSを回避し、学校のChromebookで許可が必要なドメインを
   最小化する。
 - **Vanilla JS + Web Components** (Reactは使わない): 生徒はHTML属性
-  (`src`、`color`) を編集するだけ — 40分の授業に適したレベル。ウィジェットは
-  内部で `fetch` するので、通信パネルにリクエストが見える。
+  (`src`、`color`、`title`) を編集するだけ — 40分の授業に適したレベル。
+  `title` はカードの中に見出しとして表示 (セクション見出しをカードに内包)。
+  ウィジェットは内部で `fetch` するので、通信パネルにリクエストが見える。
 - **1つの app、2つのアダプタ**: `createApp()` は Hono の純粋なアプリ
   (`/api/*` のみ)。Cloudflare では `functions/api/[[route]]` が、Node (LAN 用)
   では `server/index.ts` がラップする。データは `readFileSync` ではなく JSON の
@@ -96,3 +97,5 @@ tests/      vitest: APIコントラクト + プロキシのコア + データ整
 - 2026-07-19: デプロイをローカル直接アップロード (`pnpm deploy`) に決定。
   Cloudflare 側でビルドせず、手元のバンドルに JSON を焼き込む方式。functions の
   ローカルバンドルを検証済み (JSON inline、node:fs なし)。
+- 2026-07-19: ウィジェットに `title` 属性を追加。カードの見出しをカードの中に
+  入れ、テンプレートの外側 `<h2>` を廃止 (#5)。

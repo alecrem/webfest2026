@@ -25,17 +25,14 @@
   <h1>⭐ わたしのページ ⭐</h1>
   <p>ここに自己紹介を書こう！</p>
 
-  <h2>お気に入りポケモン</h2>
   <!-- 数字を 1〜151 に変えてみよう。一覧は /api/pokemon -->
-  <poke-card src="/api/pokemon/25" color="#ffde00"></poke-card>
+  <poke-card src="/api/pokemon/25" color="#ffde00" title="お気に入りポケモン"></poke-card>
 
-  <h2>応援しているチーム</h2>
   <!-- 野球: /api/npb/teams ・ サッカー: /api/jleague/teams -->
-  <team-card src="/api/npb/teams/tigers"></team-card>
+  <team-card src="/api/npb/teams/tigers" title="応援しているチーム"></team-card>
 
-  <h2>気になる部活</h2>
   <!-- ?category=文化部 にするとどうなる？ -->
-  <club-list src="/api/bukatsu?category=運動部"></club-list>
+  <club-list src="/api/bukatsu?category=運動部" color="#16a34a" title="気になる部活"></club-list>
 
 </body>
 </html>
