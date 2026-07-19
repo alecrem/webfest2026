@@ -8,7 +8,7 @@
   const STYLE = `
     poke-card, team-card, club-list { display: block; }
     .w-box {
-      border: 2px solid var(--w-accent, #94a3b8);
+      border: 2px solid var(--w-accent, #cbd5e1);
       border-radius: 12px;
       padding: 12px 16px;
       margin: 8px 0;
@@ -25,11 +25,15 @@
     }
     .w-error code { word-break: break-all; }
     .w-hint { color: #7f1d1d; font-size: 0.85em; margin-top: 4px; }
+    .w-card-band {
+      margin: -12px -16px 12px; padding: 8px 16px;
+      border-radius: 10px 10px 0 0; font-weight: 700;
+    }
     .w-title { font-size: 1.15em; font-weight: 700; margin: 0 0 4px; }
     .w-sub { color: #64748b; font-size: 0.85em; }
     .w-chip {
       display: inline-block; padding: 1px 10px; border-radius: 999px;
-      background: var(--w-accent, #e2e8f0); color: #1e293b;
+      background: #e2e8f0; color: #1e293b;
       font-size: 0.8em; margin-right: 4px;
     }
     .w-row { margin: 4px 0; font-size: 0.95em; }
@@ -37,7 +41,6 @@
       width: 96px; height: 96px; image-rendering: pixelated;
       float: right; margin-left: 8px;
     }
-    .w-band { height: 14px; border-radius: 8px 8px 0 0; margin: -12px -16px 10px; }
     .w-item { border-top: 1px solid #e2e8f0; padding: 8px 0; }
     .w-item:first-of-type { border-top: none; padding-top: 0; }
     .w-clear { clear: both; }
@@ -49,6 +52,18 @@
     style.setAttribute("data-webfest-widgets", "");
     style.textContent = STYLE;
     document.head.appendChild(style);
+  }
+
+  // 背景色に対して読みやすい文字色 (白か黒) を選ぶ。
+  function textOn(bg) {
+    const m = /^#?([0-9a-f]{6})$/i.exec(bg || "");
+    if (!m) return "#1e293b";
+    const n = parseInt(m[1], 16);
+    const r = (n >> 16) & 255,
+      g = (n >> 8) & 255,
+      b = n & 255;
+    const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    return lum > 0.6 ? "#1e293b" : "#ffffff";
   }
 
   function esc(value) {
@@ -67,7 +82,7 @@
 
   class ApiWidget extends HTMLElement {
     static get observedAttributes() {
-      return ["src", "color"];
+      return ["src", "color", "title"];
     }
 
     connectedCallback() {
@@ -79,9 +94,20 @@
       if (this.isConnected) this.refresh();
     }
 
-    accent() {
-      const color = this.getAttribute("color");
-      if (color) this.style.setProperty("--w-accent", color);
+    // border と帯に使う実効カラー: color 属性 → preferredBg (データ) → 既定。
+    // 同じ色を border にも帯にも使うので、カードの色が揃う。
+    applyColor(preferredBg) {
+      const c = this.getAttribute("color") || preferredBg || "#4355f9";
+      this.style.setProperty("--w-accent", c);
+      return c;
+    }
+
+    // 生徒が付けるセクション見出し。カード上部の色帯に入れる。
+    // 文字色は背景に応じて自動で読みやすく。
+    titleBand(bg) {
+      const title = this.getAttribute("title");
+      if (!title) return "";
+      return `<div class="w-card-band" style="background:${esc(bg)};color:${textOn(bg)}">${esc(title)}</div>`;
     }
 
     async refresh() {
@@ -90,7 +116,6 @@
         this.innerHTML = errorBox("src 属性にバックエンドのアドレスを書いてね");
         return;
       }
-      this.accent();
       this.innerHTML = `<div class="w-loading">読み込み中…</div>`;
       const mySrc = src;
       try {
@@ -127,7 +152,9 @@
       const types = (p.types || [])
         .map((t) => `<span class="w-chip">${esc(t)}</span>`)
         .join("");
+      const col = this.applyColor();
       return `<div class="w-box">
+        ${this.titleBand(col)}
         <img class="w-sprite" src="${esc(p.sprite)}" alt="${esc(p.nameJa)}">
         <p class="w-title">${esc(p.nameJa)}</p>
         <div class="w-sub">No.${esc(p.id)} / ${esc(p.name)}</div>
@@ -149,11 +176,9 @@
         return errorBox("チームのアドレスじゃないみたい", "例: /api/npb/teams/tigers");
       }
       const colors = t.colors || {};
-      const band = `background: linear-gradient(90deg, ${esc(
-        colors.primary || "#94a3b8",
-      )} 60%, ${esc(colors.secondary || "#e2e8f0")});`;
+      const col = this.applyColor(colors.primary);
       return `<div class="w-box">
-        <div class="w-band" style="${band}"></div>
+        ${this.titleBand(col)}
         <p class="w-title">${esc(t.name)}</p>
         ${t.league ? `<div class="w-row"><span class="w-chip">${esc(t.league)}</span></div>` : ""}
         <div class="w-row">🏟️ ${esc(t.stadium)}</div>
@@ -164,24 +189,28 @@
 
   class ClubList extends ApiWidget {
     renderItem(club) {
+      const chip = club.category
+        ? `<span class="w-chip">${esc(club.category)}</span>`
+        : "";
       return `<div class="w-item">
         <strong>${esc(club.name)}</strong>
-        <span class="w-chip">${esc(club.category)}</span>
+        ${chip}
       </div>`;
     }
 
     render(data) {
+      const col = this.applyColor();
       // リスト (/api/bukatsu) でも1件 (/api/bukatsu/kitaku) でも使える
       if (data && !Array.isArray(data) && data.name) {
-        return `<div class="w-box">${this.renderItem(data)}</div>`;
+        return `<div class="w-box">${this.titleBand(col)}${this.renderItem(data)}</div>`;
       }
       if (!Array.isArray(data)) {
         return errorBox("部活のアドレスを指定してね (例: /api/bukatsu)");
       }
       if (data.length === 0) {
-        return `<div class="w-box">0件でした。アドレスの条件を変えてみよう。</div>`;
+        return `<div class="w-box">${this.titleBand(col)}0件でした。アドレスの条件を変えてみよう。</div>`;
       }
-      return `<div class="w-box">${data.map((c) => this.renderItem(c)).join("")}</div>`;
+      return `<div class="w-box">${this.titleBand(col)}${data.map((c) => this.renderItem(c)).join("")}</div>`;
     }
   }
 

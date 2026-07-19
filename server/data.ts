@@ -9,7 +9,7 @@ import pokemonData from "../data/pokemon.json";
 export interface Club {
   id: string;
   name: string;
-  category: string;
+  category?: string;
 }
 
 export interface Pokemon {

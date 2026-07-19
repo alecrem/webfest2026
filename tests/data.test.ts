@@ -38,7 +38,9 @@ describe("データ整合性", () => {
   it("部活: id 重複なし、カテゴリは既知のもの", () => {
     expectUniqueIds(clubs);
     for (const club of clubs) {
-      expect(["運動部", "文化部", "その他"]).toContain(club.category);
+      if (club.category !== undefined) {
+        expect(["運動部", "文化部"]).toContain(club.category);
+      }
       expect(club.name.length).toBeGreaterThan(0);
     }
   });

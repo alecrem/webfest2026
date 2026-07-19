@@ -19,9 +19,14 @@ function stubFetch(payload: unknown, status = 200) {
   );
 }
 
-async function mount(tag: string, src: string): Promise<HTMLElement> {
+async function mount(
+  tag: string,
+  src: string,
+  attrs: Record<string, string> = {},
+): Promise<HTMLElement> {
   const el = document.createElement(tag);
   el.setAttribute("src", src);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
   document.body.appendChild(el);
   // refresh() の fetch → render を待つ
   await new Promise((r) => setTimeout(r, 0));
@@ -77,15 +82,17 @@ describe("widgets", () => {
   it("club-list は一覧でも1件でも描画できる", async () => {
     stubFetch([
       { id: "yakyu", name: "野球部", category: "運動部" },
-      { id: "kitaku", name: "帰宅部", category: "その他" },
+      { id: "kitaku", name: "帰宅部" },
     ]);
     const list = await mount("club-list", "/api/bukatsu");
     expect(list.innerHTML).toContain("野球部");
     expect(list.innerHTML).toContain("帰宅部");
 
-    stubFetch({ id: "kitaku", name: "帰宅部", category: "その他" });
+    stubFetch({ id: "kitaku", name: "帰宅部" });
     const single = await mount("club-list", "/api/bukatsu/kitaku");
     expect(single.innerHTML).toContain("帰宅部");
+    // カテゴリがなければチップは出さない
+    expect(single.querySelector(".w-chip")).toBeNull();
   });
 
   it("404 のときはサーバーの hint を見せる", async () => {
@@ -93,5 +100,44 @@ describe("widgets", () => {
     const el = await mount("poke-card", "/api/pokemon/999");
     expect(el.innerHTML).toContain("404");
     expect(el.innerHTML).toContain("1〜151だよ");
+  });
+
+  it("title 属性はカードの中に見出しとして入る (poke-card)", async () => {
+    stubFetch({
+      id: 25,
+      name: "pikachu",
+      nameJa: "ピカチュウ",
+      types: ["でんき"],
+      sprite: "/img/pokemon/25.png",
+    });
+    const el = await mount("poke-card", "/api/pokemon/25", {
+      title: "お気に入り",
+    });
+    const box = el.querySelector(".w-box");
+    const titleEl = el.querySelector(".w-card-band");
+    expect(titleEl?.textContent).toBe("お気に入り");
+    // カードの外ではなく中にある
+    expect(box?.contains(titleEl ?? null)).toBe(true);
+  });
+
+  it("title は一覧カードの中にも入る (club-list)", async () => {
+    stubFetch([{ id: "yakyu", name: "野球部", category: "運動部" }]);
+    const el = await mount("club-list", "/api/bukatsu", { title: "部活" });
+    const box = el.querySelector(".w-box");
+    const titleEl = el.querySelector(".w-card-band");
+    expect(titleEl?.textContent).toBe("部活");
+    expect(box?.contains(titleEl ?? null)).toBe(true);
+  });
+
+  it("title がなければ見出しは出ない", async () => {
+    stubFetch({
+      id: 25,
+      name: "pikachu",
+      nameJa: "ピカチュウ",
+      types: ["でんき"],
+      sprite: "/img/pokemon/25.png",
+    });
+    const el = await mount("poke-card", "/api/pokemon/25");
+    expect(el.querySelector(".w-card-band")).toBeNull();
   });
 });

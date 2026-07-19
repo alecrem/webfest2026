@@ -50,7 +50,7 @@ describe("GET /api/bukatsu", () => {
 
   it("id で1つの部活を取得、なければ hint 付き 404", async () => {
     const { body } = await get("/api/bukatsu/kitaku");
-    expect(body).toEqual({ id: "kitaku", name: "帰宅部", category: "その他" });
+    expect(body).toEqual({ id: "kitaku", name: "帰宅部" });
     const { res, body: err } = await get("/api/bukatsu/unknown");
     expect(res.status).toBe(404);
     expect(err.hint).toContain("kitaku");
