@@ -1,21 +1,8 @@
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { Hono } from "hono";
 import type { Context } from "hono";
 import { clubs, jleagueTeams, npbTeams, pokemon } from "./data";
 import type { Team } from "./data";
 import { explorerHtml } from "./explorer";
-import { spriteProxy } from "./sprites";
-
-const defaultSpriteCache = path.join(
-  path.dirname(path.dirname(fileURLToPath(import.meta.url))),
-  ".cache/sprites",
-);
-
-export interface AppOptions {
-  spriteCacheDir?: string;
-  fetchImpl?: typeof fetch;
-}
 
 // 生徒がURLをブラウザで直接開くことも想定して、JSONは整形して返す。
 function json(c: Context, data: unknown, status: 200 | 404 = 200) {
@@ -42,16 +29,8 @@ function teamRoutes(app: Hono, base: string, teams: Team[]) {
   });
 }
 
-export function createApp(options: AppOptions = {}) {
+export function createApp() {
   const app = new Hono();
-
-  app.get(
-    "/img/pokemon/:file",
-    spriteProxy({
-      cacheDir: options.spriteCacheDir ?? defaultSpriteCache,
-      fetchImpl: options.fetchImpl,
-    }),
-  );
 
   app.get("/api", (c) => {
     // ブラウザで開いたらエクスプローラー、fetch にはJSONの一覧。

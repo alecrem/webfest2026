@@ -1,0 +1,6 @@
+# Cloudflare Pages の設定。
+# 静的ファイルは dist/editor、/api と /img/pokemon は functions/ が処理する。
+# nodejs_compat は不要 (実行時に node:* を使わない)。
+name = "webfest2026"
+pages_build_output_dir = "dist/editor"
+compatibility_date = "2026-07-19"

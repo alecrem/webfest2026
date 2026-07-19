@@ -8,7 +8,8 @@
     "strict": true,
     "noEmit": true,
     "skipLibCheck": true,
+    "resolveJsonModule": true,
     "verbatimModuleSyntax": true
   },
-  "include": ["server", "editor/src", "tests", "scripts"]
+  "include": ["server", "editor/src", "tests", "scripts", "functions"]
 }
