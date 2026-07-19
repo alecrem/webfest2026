@@ -1,0 +1,122 @@
+[
+  {
+    "id": "giants",
+    "name": "読売ジャイアンツ",
+    "shortName": "巨人",
+    "league": "セ・リーグ",
+    "hometown": "東京都",
+    "stadium": "東京ドーム",
+    "founded": 1934,
+    "colors": { "primary": "#f97709", "secondary": "#000000" }
+  },
+  {
+    "id": "tigers",
+    "name": "阪神タイガース",
+    "shortName": "阪神",
+    "league": "セ・リーグ",
+    "hometown": "兵庫県西宮市",
+    "stadium": "阪神甲子園球場",
+    "founded": 1935,
+    "colors": { "primary": "#ffe201", "secondary": "#000000" }
+  },
+  {
+    "id": "dragons",
+    "name": "中日ドラゴンズ",
+    "shortName": "中日",
+    "league": "セ・リーグ",
+    "hometown": "愛知県名古屋市",
+    "stadium": "バンテリンドーム ナゴヤ",
+    "founded": 1936,
+    "colors": { "primary": "#003595", "secondary": "#ffffff" }
+  },
+  {
+    "id": "carp",
+    "name": "広島東洋カープ",
+    "shortName": "広島",
+    "league": "セ・リーグ",
+    "hometown": "広島県広島市",
+    "stadium": "MAZDA Zoom-Zoom スタジアム広島",
+    "founded": 1950,
+    "colors": { "primary": "#ff2b06", "secondary": "#ffffff" }
+  },
+  {
+    "id": "swallows",
+    "name": "東京ヤクルトスワローズ",
+    "shortName": "ヤクルト",
+    "league": "セ・リーグ",
+    "hometown": "東京都",
+    "stadium": "明治神宮野球場",
+    "founded": 1950,
+    "colors": { "primary": "#00985e", "secondary": "#132448" }
+  },
+  {
+    "id": "baystars",
+    "name": "横浜DeNAベイスターズ",
+    "shortName": "DeNA",
+    "league": "セ・リーグ",
+    "hometown": "神奈川県横浜市",
+    "stadium": "横浜スタジアム",
+    "founded": 1950,
+    "colors": { "primary": "#004a95", "secondary": "#ffffff" }
+  },
+  {
+    "id": "hawks",
+    "name": "福岡ソフトバンクホークス",
+    "shortName": "ソフトバンク",
+    "league": "パ・リーグ",
+    "hometown": "福岡県福岡市",
+    "stadium": "みずほPayPayドーム福岡",
+    "founded": 1938,
+    "colors": { "primary": "#fcc700", "secondary": "#000000" }
+  },
+  {
+    "id": "fighters",
+    "name": "北海道日本ハムファイターズ",
+    "shortName": "日本ハム",
+    "league": "パ・リーグ",
+    "hometown": "北海道北広島市",
+    "stadium": "エスコンフィールドHOKKAIDO",
+    "founded": 1946,
+    "colors": { "primary": "#01609a", "secondary": "#c9b072" }
+  },
+  {
+    "id": "marines",
+    "name": "千葉ロッテマリーンズ",
+    "shortName": "ロッテ",
+    "league": "パ・リーグ",
+    "hometown": "千葉県千葉市",
+    "stadium": "ZOZOマリンスタジアム",
+    "founded": 1950,
+    "colors": { "primary": "#221815", "secondary": "#c0c0c0" }
+  },
+  {
+    "id": "eagles",
+    "name": "東北楽天ゴールデンイーグルス",
+    "shortName": "楽天",
+    "league": "パ・リーグ",
+    "hometown": "宮城県仙台市",
+    "stadium": "楽天モバイルパーク宮城",
+    "founded": 2005,
+    "colors": { "primary": "#870010", "secondary": "#b3a26b" }
+  },
+  {
+    "id": "buffaloes",
+    "name": "オリックス・バファローズ",
+    "shortName": "オリックス",
+    "league": "パ・リーグ",
+    "hometown": "大阪府大阪市",
+    "stadium": "京セラドーム大阪",
+    "founded": 1936,
+    "colors": { "primary": "#000019", "secondary": "#b78d4c" }
+  },
+  {
+    "id": "lions",
+    "name": "埼玉西武ライオンズ",
+    "shortName": "西武",
+    "league": "パ・リーグ",
+    "hometown": "埼玉県所沢市",
+    "stadium": "ベルーナドーム",
+    "founded": 1950,
+    "colors": { "primary": "#102961", "secondary": "#00a5b3" }
+  }
+]

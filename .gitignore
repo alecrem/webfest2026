@@ -1,0 +1,8 @@
+node_modules/
+dist/
+
+# `pnpm compose-data` で生成 (第三者の権利物のためコミットしない)
+data/pokemon.json
+.cache/
+*.log
+.DS_Store

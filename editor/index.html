@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ウェブフェス</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <header class="toolbar">
+      <span class="logo">🛠️ ウェブフェス</span>
+      <button id="save" class="primary">💾 保存して表示 (Ctrl+S)</button>
+      <button id="copy">📋 HTMLをコピー</button>
+      <button id="reset">🗑️ 最初にもどす</button>
+      <span class="spacer"></span>
+      <a href="/api" target="_blank" class="api-link">バックエンドをのぞく →</a>
+    </header>
+    <main class="split">
+      <section id="editor" class="pane"></section>
+      <div id="gutter-main" class="gutter gutter-x" role="separator" aria-orientation="vertical"></div>
+      <section class="pane right">
+        <iframe id="preview" title="プレビュー" sandbox="allow-scripts allow-same-origin"></iframe>
+        <div id="gutter-right" class="gutter gutter-y" role="separator" aria-orientation="horizontal"></div>
+        <div id="requests" class="requests">
+          <div class="requests-title">📡 このページの通信 (フロントエンド → バックエンド)</div>
+          <ul id="requests-list"></ul>
+        </div>
+      </section>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

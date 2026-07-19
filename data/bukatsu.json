@@ -1,0 +1,11 @@
+[
+  { "id": "yakyu", "name": "野球部", "category": "運動部" },
+  { "id": "soccer", "name": "サッカー部", "category": "運動部" },
+  { "id": "volley", "name": "女子バレーボール部", "category": "運動部" },
+  { "id": "basket", "name": "バスケットボール部", "category": "運動部" },
+  { "id": "kendo", "name": "剣道部", "category": "運動部" },
+  { "id": "rikujo", "name": "陸上部", "category": "運動部" },
+  { "id": "suisogaku", "name": "吹奏楽部", "category": "文化部" },
+  { "id": "bijutsu", "name": "美術部", "category": "文化部" },
+  { "id": "kitaku", "name": "帰宅部", "category": "その他" }
+]

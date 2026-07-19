@@ -1,0 +1,162 @@
+[
+  {
+    "id": "kashima",
+    "name": "鹿島アントラーズ",
+    "hometown": "茨城県鹿嶋市",
+    "stadium": "県立カシマサッカースタジアム",
+    "founded": 1947,
+    "colors": { "primary": "#9a0034", "secondary": "#040404" }
+  },
+  {
+    "id": "urawa",
+    "name": "浦和レッズ",
+    "hometown": "埼玉県さいたま市",
+    "stadium": "埼玉スタジアム2002",
+    "founded": 1950,
+    "colors": { "primary": "#e60012", "secondary": "#000000" }
+  },
+  {
+    "id": "kashiwa",
+    "name": "柏レイソル",
+    "hometown": "千葉県柏市",
+    "stadium": "三協フロンテア柏スタジアム",
+    "founded": 1940,
+    "colors": { "primary": "#ffe100", "secondary": "#000000" }
+  },
+  {
+    "id": "fctokyo",
+    "name": "FC東京",
+    "hometown": "東京都",
+    "stadium": "味の素スタジアム",
+    "founded": 1935,
+    "colors": { "primary": "#0033a0", "secondary": "#e60012" }
+  },
+  {
+    "id": "verdy",
+    "name": "東京ヴェルディ",
+    "hometown": "東京都",
+    "stadium": "味の素スタジアム",
+    "founded": 1969,
+    "colors": { "primary": "#006931", "secondary": "#ffffff" }
+  },
+  {
+    "id": "machida",
+    "name": "FC町田ゼルビア",
+    "hometown": "東京都町田市",
+    "stadium": "町田GIONスタジアム",
+    "founded": 1989,
+    "colors": { "primary": "#0053a0", "secondary": "#ffffff" }
+  },
+  {
+    "id": "kawasaki",
+    "name": "川崎フロンターレ",
+    "hometown": "神奈川県川崎市",
+    "stadium": "Uvance とどろきスタジアム by Fujitsu",
+    "founded": 1955,
+    "colors": { "primary": "#009fe8", "secondary": "#040404" }
+  },
+  {
+    "id": "marinos",
+    "name": "横浜F・マリノス",
+    "hometown": "神奈川県横浜市",
+    "stadium": "日産スタジアム",
+    "founded": 1972,
+    "colors": { "primary": "#003ea0", "secondary": "#e60012" }
+  },
+  {
+    "id": "shonan",
+    "name": "湘南ベルマーレ",
+    "hometown": "神奈川県平塚市",
+    "stadium": "レモンガススタジアム平塚",
+    "founded": 1968,
+    "colors": { "primary": "#95c94a", "secondary": "#00544f" }
+  },
+  {
+    "id": "niigata",
+    "name": "アルビレックス新潟",
+    "hometown": "新潟県新潟市",
+    "stadium": "デンカビッグスワンスタジアム",
+    "founded": 1955,
+    "colors": { "primary": "#f39800", "secondary": "#004097" }
+  },
+  {
+    "id": "shimizu",
+    "name": "清水エスパルス",
+    "hometown": "静岡県静岡市",
+    "stadium": "IAIスタジアム日本平",
+    "founded": 1991,
+    "colors": { "primary": "#ff8c00", "secondary": "#ffffff" }
+  },
+  {
+    "id": "nagoya",
+    "name": "名古屋グランパス",
+    "hometown": "愛知県名古屋市",
+    "stadium": "豊田スタジアム",
+    "founded": 1939,
+    "colors": { "primary": "#d70910", "secondary": "#f8b500" }
+  },
+  {
+    "id": "kyoto",
+    "name": "京都サンガF.C.",
+    "hometown": "京都府京都市",
+    "stadium": "サンガスタジアム by KYOCERA",
+    "founded": 1922,
+    "colors": { "primary": "#800080", "secondary": "#ffffff" }
+  },
+  {
+    "id": "gamba",
+    "name": "ガンバ大阪",
+    "hometown": "大阪府吹田市",
+    "stadium": "パナソニックスタジアム吹田",
+    "founded": 1980,
+    "colors": { "primary": "#000080", "secondary": "#000000" }
+  },
+  {
+    "id": "cerezo",
+    "name": "セレッソ大阪",
+    "hometown": "大阪府大阪市",
+    "stadium": "ヨドコウ桜スタジアム",
+    "founded": 1957,
+    "colors": { "primary": "#e5006a", "secondary": "#001d3d" }
+  },
+  {
+    "id": "vissel",
+    "name": "ヴィッセル神戸",
+    "hometown": "兵庫県神戸市",
+    "stadium": "ノエビアスタジアム神戸",
+    "founded": 1966,
+    "colors": { "primary": "#870021", "secondary": "#000000" }
+  },
+  {
+    "id": "hiroshima",
+    "name": "サンフレッチェ広島",
+    "hometown": "広島県広島市",
+    "stadium": "エディオンピースウイング広島",
+    "founded": 1938,
+    "colors": { "primary": "#6e30ac", "secondary": "#ffffff" }
+  },
+  {
+    "id": "fukuoka",
+    "name": "アビスパ福岡",
+    "hometown": "福岡県福岡市",
+    "stadium": "ベスト電器スタジアム",
+    "founded": 1982,
+    "colors": { "primary": "#001e50", "secondary": "#8c8c8c" }
+  },
+  {
+    "id": "okayama",
+    "name": "ファジアーノ岡山",
+    "hometown": "岡山県岡山市",
+    "stadium": "JFE晴れの国スタジアム",
+    "founded": 1975,
+    "colors": { "primary": "#aa0000", "secondary": "#ffffff" }
+  },
+  {
+    "id": "yokohamafc",
+    "name": "横浜FC",
+    "hometown": "神奈川県横浜市",
+    "stadium": "ニッパツ三ツ沢球技場",
+    "founded": 1999,
+    "colors": { "primary": "#00a0e9", "secondary": "#ffffff" }
+  }
+]
