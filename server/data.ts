@@ -1,6 +1,10 @@
-import { readFileSync } from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
+// JSONはビルド時にバンドルへ取り込む (import)。Cloudflare Workers には
+// ファイルシステムがないため readFileSync は使えない。pokemon.json は
+// `pnpm compose-data` で事前生成される (git管理外)。
+import bukatsu from "../data/bukatsu.json";
+import jleague from "../data/jleague.json";
+import npb from "../data/npb.json";
+import pokemonData from "../data/pokemon.json";
 
 export interface Club {
   id: string;
@@ -27,25 +31,7 @@ export interface Team {
   shortName?: string;
 }
 
-const dataDir = path.join(
-  path.dirname(path.dirname(fileURLToPath(import.meta.url))),
-  "data",
-);
-
-function load<T>(file: string): T {
-  try {
-    return JSON.parse(readFileSync(path.join(dataDir, file), "utf8")) as T;
-  } catch (err) {
-    if ((err as NodeJS.ErrnoException).code === "ENOENT") {
-      throw new Error(
-        `data/${file} がありません — \`pnpm compose-data\` で生成してください`,
-      );
-    }
-    throw err;
-  }
-}
-
-export const clubs = load<Club[]>("bukatsu.json");
-export const pokemon = load<Pokemon[]>("pokemon.json");
-export const npbTeams = load<Team[]>("npb.json");
-export const jleagueTeams = load<Team[]>("jleague.json");
+export const clubs = bukatsu as Club[];
+export const pokemon = pokemonData as Pokemon[];
+export const npbTeams = npb as Team[];
+export const jleagueTeams = jleague as Team[];

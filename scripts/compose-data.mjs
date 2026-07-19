@@ -1,12 +1,12 @@
-// PokéAPI から第1世代 (151匹) を取得して data/pokemon.json を生成し、
-// .cache/sprites にスプライトのキャッシュを作る。生成物はコミットしない:
-// `pnpm compose-data` でいつでも再現できる。
-import { mkdir, writeFile } from "node:fs/promises";
+// PokéAPI から第1世代 (151匹) のデータを取得して data/pokemon.json を生成する。
+// 画像は落とさない: スプライトは実行時に /img/pokemon/:id.png のプロキシが
+// 必要な分だけ取得する (数を増やしてもビルドが重くならない)。
+// 生成物はコミットしない: `pnpm compose-data` でいつでも再現できる。
+import { writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
-const SPRITES_DIR = path.join(root, ".cache/sprites");
 const DATA_FILE = path.join(root, "data/pokemon.json");
 const COUNT = 151;
 
@@ -44,18 +44,10 @@ async function fetchOne(id) {
   ]);
 
   const nameJa =
-    species.names.find((n) => n.language.name === "ja")?.name ??
-    pokemon.name;
-
-  const spriteUrl = pokemon.sprites.front_default;
-  const spriteRes = await fetch(spriteUrl);
-  if (!spriteRes.ok) throw new Error(`${spriteRes.status} ${spriteUrl}`);
-  await writeFile(
-    path.join(SPRITES_DIR, `${id}.png`),
-    Buffer.from(await spriteRes.arrayBuffer()),
-  );
+    species.names.find((n) => n.language.name === "ja")?.name ?? pokemon.name;
 
   // 活動に必要な最小限 (id・名前・タイプ・スプライト) だけを保存する。
+  // sprite はプロキシのパス。画像そのものはここでは落とさない。
   return {
     id,
     name: pokemon.name,
@@ -64,8 +56,6 @@ async function fetchOne(id) {
     sprite: `/img/pokemon/${id}.png`,
   };
 }
-
-await mkdir(SPRITES_DIR, { recursive: true });
 
 const all = [];
 const BATCH = 10;
@@ -80,4 +70,4 @@ for (let start = 1; start <= COUNT; start += BATCH) {
 
 all.sort((a, b) => a.id - b.id);
 await writeFile(DATA_FILE, JSON.stringify(all, null, 2) + "\n");
-console.log(`\nOK → ${DATA_FILE} (+ sprites en ${SPRITES_DIR})`);
+console.log(`\nOK → ${DATA_FILE}`);

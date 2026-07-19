@@ -1,45 +1,41 @@
-import { existsSync, mkdirSync } from "node:fs";
-import { readFile, writeFile } from "node:fs/promises";
-import path from "node:path";
-import type { Context } from "hono";
-
-// スプライトプロキシ: 生徒からはこのサーバーしか見えない。初回アクセス時に
-// PokéAPI から取得してディスクにキャッシュする (`pnpm compose-data` でも
-// 温められるので、授業はオフラインで動く)。
+// スプライトのプロキシ (ランタイム非依存のコア)。
+// 生徒からはこのオリジンしか見えない: サーバー側が PokéAPI から取得して
+// 返すので single-origin を保てる。キャッシュは呼び出し側で行う:
+// Cloudflare は edge の Cache API、Node 開発サーバーは都度取得。
 const UPSTREAM =
   "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon";
 const MAX_ID = 151;
 
-export interface SpriteProxyOptions {
-  cacheDir: string;
-  fetchImpl?: typeof fetch;
+function errorJson(body: unknown, status: number): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { "content-type": "application/json; charset=utf-8" },
+  });
 }
 
-export function spriteProxy({ cacheDir, fetchImpl = fetch }: SpriteProxyOptions) {
-  mkdirSync(cacheDir, { recursive: true });
+export async function spriteResponse(
+  file: string | undefined,
+  fetchImpl: typeof fetch = fetch,
+): Promise<Response> {
+  const match = /^(\d+)\.png$/.exec(file ?? "");
+  const id = match ? Number(match[1]) : NaN;
+  if (!match || id < 1 || id > MAX_ID) {
+    return errorJson(
+      { error: "見つかりませんでした", hint: `1.png 〜 ${MAX_ID}.png` },
+      404,
+    );
+  }
 
-  return async (c: Context) => {
-    const match = /^(\d+)\.png$/.exec(c.req.param("file") ?? "");
-    const id = match ? Number(match[1]) : NaN;
-    if (!match || id < 1 || id > MAX_ID) {
-      return c.json(
-        { error: "見つかりませんでした", hint: "1.png 〜 151.png" },
-        404,
-      );
-    }
+  const upstream = await fetchImpl(`${UPSTREAM}/${id}.png`);
+  if (!upstream.ok) {
+    return errorJson({ error: "画像を取得できませんでした" }, 502);
+  }
 
-    const cached = path.join(cacheDir, `${id}.png`);
-    if (!existsSync(cached)) {
-      const res = await fetchImpl(`${UPSTREAM}/${id}.png`);
-      if (!res.ok) {
-        return c.json({ error: "画像を取得できませんでした" }, 502);
-      }
-      await writeFile(cached, Buffer.from(await res.arrayBuffer()));
-    }
-
-    return c.body(new Uint8Array(await readFile(cached)), 200, {
+  return new Response(upstream.body, {
+    status: 200,
+    headers: {
       "content-type": "image/png",
-      "cache-control": "public, max-age=86400",
-    });
-  };
+      "cache-control": "public, max-age=31536000, immutable",
+    },
+  });
 }
