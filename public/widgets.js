@@ -17,7 +17,7 @@
       margin: 8px 0;
       max-width: 420px;
       background: #fff;
-      color: #1e293b;
+      color: inherit;
       font-family: inherit;
     }
     .w-loading { color: #64748b; padding: 8px 0; }

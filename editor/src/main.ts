@@ -3,6 +3,7 @@ import { keymap } from "@codemirror/view";
 import { html } from "@codemirror/lang-html";
 import { lintGutter } from "@codemirror/lint";
 import template from "./template.html?raw";
+import { colorSwatch } from "./color-swatch";
 import { htmlLint } from "./lint";
 import { listenToPreview, renderPreview } from "./preview";
 import { createRequestsPanel } from "./requests-panel";
@@ -38,6 +39,7 @@ const view = new EditorView({
     ]),
     basicSetup,
     html(),
+    colorSwatch,
     htmlLint,
     lintGutter(),
     EditorView.theme({
