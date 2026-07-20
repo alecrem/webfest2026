@@ -65,6 +65,31 @@ describe("GET /api/bukatsu", () => {
   });
 });
 
+describe("ids でまとめて取得", () => {
+  it("部活: 書いた順に返し、未知の id は無視する", async () => {
+    const { body } = await get("/api/bukatsu?ids=bijutsu,yakyu,nope");
+    expect(body.map((c: { id: string }) => c.id)).toEqual(["bijutsu", "yakyu"]);
+  });
+
+  it("ポケモン: 番号を書いた順に返す", async () => {
+    const { body } = await get("/api/pokemon?ids=7,25");
+    expect(body.map((p: { id: number }) => p.id)).toEqual([7, 25]);
+    expect(body[0]).not.toHaveProperty("types");
+  });
+
+  it("NPB: 書いた順に返し、別競技 (Jリーグ) の id はヒットしない", async () => {
+    const { body } = await get("/api/npb/teams?ids=giants,tigers");
+    expect(body.map((t: { id: string }) => t.id)).toEqual(["giants", "tigers"]);
+    const { body: crossed } = await get("/api/npb/teams?ids=kashima");
+    expect(crossed).toEqual([]);
+  });
+
+  it("どれも見つからなければ空配列", async () => {
+    const { body } = await get("/api/bukatsu?ids=nope1,nope2");
+    expect(body).toEqual([]);
+  });
+});
+
 describe("GET /api/pokemon", () => {
   it("151匹をサマリー項目で返す", async () => {
     const { body } = await get("/api/pokemon");
