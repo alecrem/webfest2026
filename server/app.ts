@@ -15,8 +15,25 @@ function notFound(c: Context, hint: string) {
   return json(c, { error: "見つかりませんでした", hint }, 404);
 }
 
+// カンマ区切りの ids で、生徒が書いた順に取り出す。未知の id は無視する。
+// 別の競技の id などヒットしないものは自然に除かれる (= 同じ endpoint 内だけ)。
+function pickByIds<T>(
+  items: T[],
+  idsParam: string,
+  idOf: (item: T) => string | number,
+): T[] {
+  return idsParam
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .map((id) => items.find((item) => String(idOf(item)) === id))
+    .filter((item): item is T => item !== undefined);
+}
+
 function teamRoutes(app: Hono, base: string, teams: Team[]) {
   app.get(`${base}/teams`, (c) => {
+    const ids = c.req.query("ids");
+    if (ids) return json(c, pickByIds(teams, ids, (t) => t.id));
     const league = c.req.query("league");
     return json(c, league ? teams.filter((t) => t.league === league) : teams);
   });
@@ -42,13 +59,16 @@ export function createApp() {
       endpoints: [
         "/api/bukatsu",
         "/api/bukatsu?category=運動部",
+        "/api/bukatsu?ids=yakyu,bijutsu",
         "/api/bukatsu/kitaku",
         "/api/pokemon",
         "/api/pokemon?type=ほのお",
+        "/api/pokemon?ids=25,7",
         "/api/pokemon/25",
         "/api/pokemon/pikachu",
         "/api/npb/teams",
         "/api/npb/teams?league=セ・リーグ",
+        "/api/npb/teams?ids=tigers,giants",
         "/api/npb/teams/tigers",
         "/api/jleague/teams",
         "/api/jleague/teams/kawasaki",
@@ -57,6 +77,8 @@ export function createApp() {
   });
 
   app.get("/api/bukatsu", (c) => {
+    const ids = c.req.query("ids");
+    if (ids) return json(c, pickByIds(clubs, ids, (x) => x.id));
     const category = c.req.query("category");
     return json(
       c,
@@ -73,8 +95,13 @@ export function createApp() {
   });
 
   app.get("/api/pokemon", (c) => {
+    const ids = c.req.query("ids");
     const type = c.req.query("type");
-    const list = type ? pokemon.filter((p) => p.types.includes(type)) : pokemon;
+    const list = ids
+      ? pickByIds(pokemon, ids, (p) => p.id)
+      : type
+        ? pokemon.filter((p) => p.types.includes(type))
+        : pokemon;
     return json(
       c,
       list.map(({ id, name, nameJa, sprite }) => ({ id, name, nameJa, sprite })),

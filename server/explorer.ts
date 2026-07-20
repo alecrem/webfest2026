@@ -71,12 +71,15 @@ export const explorerHtml = `<!DOCTYPE html>
     "/api/pokemon/pikachu",
     "/api/pokemon",
     "/api/pokemon?type=ほのお",
+    "/api/pokemon?ids=25,7",
     "/api/bukatsu",
     "/api/bukatsu?category=文化部",
+    "/api/bukatsu?ids=yakyu,bijutsu",
     "/api/bukatsu/kitaku",
     "/api/npb/teams",
     "/api/npb/teams/tigers",
     "/api/npb/teams?league=パ・リーグ",
+    "/api/npb/teams?ids=tigers,giants",
     "/api/jleague/teams",
     "/api/jleague/teams/kawasaki"
   ];
