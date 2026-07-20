@@ -55,14 +55,20 @@ describe("widgets", () => {
     );
   });
 
-  it("poke-card に一覧のアドレスを入れると選び方をおしえる", async () => {
-    stubFetch([{ id: 7 }, { id: 8 }, { id: 9 }]);
+  it("poke-card は一覧のアドレスでもコンパクトに描画する", async () => {
+    stubFetch([
+      { id: 7, name: "squirtle", nameJa: "ゼニガメ", sprite: "/img/pokemon/7.png" },
+      { id: 8, name: "wartortle", nameJa: "カメール", sprite: "/img/pokemon/8.png" },
+    ]);
     const el = await mount("poke-card", "/api/pokemon?type=みず");
-    expect(el.innerHTML).toContain("3匹見つかった");
-    expect(el.innerHTML).toContain("/api/pokemon/25");
+    expect(el.innerHTML).toContain("ゼニガメ");
+    expect(el.innerHTML).toContain("カメール");
+    // 一覧はコンパクトなサムネイルで並ぶ
+    expect(el.querySelectorAll(".w-item").length).toBe(2);
+    expect(el.querySelector(".w-thumb")).not.toBeNull();
   });
 
-  it("team-card はチームを、一覧なら選び方を描画する", async () => {
+  it("team-card はチームでも一覧でも描画する", async () => {
     stubFetch({
       id: "tigers",
       name: "阪神タイガース",
@@ -73,10 +79,30 @@ describe("widgets", () => {
     });
     const card = await mount("team-card", "/api/npb/teams/tigers");
     expect(card.innerHTML).toContain("阪神タイガース");
+    expect(card.querySelector(".w-title")?.textContent).toBe("阪神タイガース");
 
-    stubFetch([{ id: "a" }, { id: "b" }]);
+    stubFetch([
+      { id: "tigers", name: "阪神タイガース", league: "セ・リーグ" },
+      { id: "giants", name: "読売ジャイアンツ", league: "セ・リーグ" },
+    ]);
     const list = await mount("team-card", "/api/npb/teams");
-    expect(list.innerHTML).toContain("2チーム見つかった");
+    expect(list.querySelectorAll(".w-item").length).toBe(2);
+    expect(list.innerHTML).toContain("読売ジャイアンツ");
+  });
+
+  it("一覧は最大5件で、残りは「ほか N件」とまとめる", async () => {
+    const many = Array.from({ length: 8 }, (_, i) => ({
+      id: i + 1,
+      name: `p${i + 1}`,
+      nameJa: `ポケ${i + 1}`,
+      sprite: `/img/pokemon/${i + 1}.png`,
+    }));
+    stubFetch(many);
+    const el = await mount("poke-card", "/api/pokemon");
+    expect(el.querySelectorAll(".w-item").length).toBe(5);
+    expect(el.querySelector(".w-more")?.textContent).toContain("ほか 3件");
+    // 6件目以降は出さない
+    expect(el.innerHTML).not.toContain("ポケ6");
   });
 
   it("club-list は一覧でも1件でも描画できる", async () => {

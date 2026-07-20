@@ -5,6 +5,9 @@
 (() => {
   "use strict";
 
+  // 一覧で表示する最大件数。これを超えたぶんは「ほか N件」とまとめる。
+  const MAX_ITEMS = 5;
+
   const STYLE = `
     poke-card, team-card, club-list { display: block; }
     .w-box {
@@ -43,6 +46,12 @@
     }
     .w-item { border-top: 1px solid #e2e8f0; padding: 8px 0; }
     .w-item:first-of-type { border-top: none; padding-top: 0; }
+    .w-thumb {
+      width: 32px; height: 32px; image-rendering: pixelated;
+      vertical-align: middle; margin-right: 6px;
+    }
+    .w-item .w-sub { margin-left: 6px; }
+    .w-more { color: #64748b; font-size: 0.85em; padding: 8px 0 0; }
     .w-clear { clear: both; }
   `;
 
@@ -110,6 +119,40 @@
       return `<div class="w-card-band" style="background:${esc(bg)};color:${textOn(bg)}">${esc(title)}</div>`;
     }
 
+    // 一覧 (配列) でも単一でも描画する。/api の例をどれでも貼れる。
+    // 各ウィジェットは preferredColor / isOne / renderOne / renderItem /
+    // badHint を用意するだけでよい。
+    render(data) {
+      if (Array.isArray(data)) {
+        const band = this.titleBand(this.applyColor());
+        if (data.length === 0) {
+          return `<div class="w-box">${band}0件でした。アドレスの条件を変えてみよう。</div>`;
+        }
+        // カードが長くなりすぎないよう、最大5件だけ出して残りは件数で示す。
+        const shown = data.slice(0, MAX_ITEMS);
+        const rest = data.length - shown.length;
+        const items = shown.map((x) => this.renderItem(x)).join("");
+        const more = rest > 0 ? `<div class="w-more">ほか ${rest}件</div>` : "";
+        return `<div class="w-box">${band}${items}${more}</div>`;
+      }
+      if (!this.isOne(data)) {
+        return errorBox(this.badHint(), this.example());
+      }
+      const band = this.titleBand(this.applyColor(this.preferredColor(data)));
+      return `<div class="w-box">${band}${this.renderOne(data)}</div>`;
+    }
+
+    // 既定のフック (各ウィジェットで必要に応じて上書き)
+    preferredColor() {
+      return undefined;
+    }
+    isOne(data) {
+      return Boolean(data && data.name);
+    }
+    example() {
+      return "";
+    }
+
     async refresh() {
       const src = this.getAttribute("src");
       if (!src) {
@@ -138,56 +181,68 @@
   }
 
   class PokeCard extends ApiWidget {
-    render(p) {
-      // 一覧のアドレスを入れてしまったら、選び方をおしえる
-      if (Array.isArray(p)) {
-        return errorBox(
-          `これは一覧のアドレスだよ (${p.length}匹見つかった)。1匹だけ選んでね`,
-          "例: /api/pokemon/25",
-        );
-      }
-      if (!p || !p.nameJa) {
-        return errorBox("ポケモンのアドレスじゃないみたい", "例: /api/pokemon/25");
-      }
+    isOne(p) {
+      return Boolean(p && p.nameJa);
+    }
+    badHint() {
+      return "ポケモンのアドレスじゃないみたい";
+    }
+    example() {
+      return "例: /api/pokemon/25";
+    }
+    // 単一: 大きなスプライトとタイプを見せる
+    renderOne(p) {
       const types = (p.types || [])
         .map((t) => `<span class="w-chip">${esc(t)}</span>`)
         .join("");
-      const col = this.applyColor();
-      return `<div class="w-box">
-        ${this.titleBand(col)}
-        <img class="w-sprite" src="${esc(p.sprite)}" alt="${esc(p.nameJa)}">
+      return `<img class="w-sprite" src="${esc(p.sprite)}" alt="${esc(p.nameJa)}">
         <p class="w-title">${esc(p.nameJa)}</p>
         <div class="w-sub">No.${esc(p.id)} / ${esc(p.name)}</div>
         <div class="w-row">${types}</div>
-        <div class="w-clear"></div>
+        <div class="w-clear"></div>`;
+    }
+    // 一覧: 小さなサムネイルと名前だけのコンパクト表示
+    renderItem(p) {
+      return `<div class="w-item">
+        <img class="w-thumb" src="${esc(p.sprite)}" alt="${esc(p.nameJa)}">
+        <strong>${esc(p.nameJa)}</strong>
+        <span class="w-sub">No.${esc(p.id)}</span>
       </div>`;
     }
   }
 
   class TeamCard extends ApiWidget {
-    render(t) {
-      if (Array.isArray(t)) {
-        return errorBox(
-          `これは一覧のアドレスだよ (${t.length}チーム見つかった)。1チームだけ選んでね`,
-          "例: /api/npb/teams/tigers",
-        );
-      }
-      if (!t || !t.name) {
-        return errorBox("チームのアドレスじゃないみたい", "例: /api/npb/teams/tigers");
-      }
-      const colors = t.colors || {};
-      const col = this.applyColor(colors.primary);
-      return `<div class="w-box">
-        ${this.titleBand(col)}
-        <p class="w-title">${esc(t.name)}</p>
+    badHint() {
+      return "チームのアドレスじゃないみたい";
+    }
+    example() {
+      return "例: /api/npb/teams/tigers";
+    }
+    preferredColor(t) {
+      return (t.colors || {}).primary;
+    }
+    renderOne(t) {
+      return `<p class="w-title">${esc(t.name)}</p>
         ${t.league ? `<div class="w-row"><span class="w-chip">${esc(t.league)}</span></div>` : ""}
         <div class="w-row">🏟️ ${esc(t.stadium)}</div>
-        <div class="w-row">📍 ${esc(t.hometown)} ・ ${esc(t.founded)}年から</div>
+        <div class="w-row">📍 ${esc(t.hometown)} ・ ${esc(t.founded)}年から</div>`;
+    }
+    renderItem(t) {
+      return `<div class="w-item">
+        <strong>${esc(t.name)}</strong>
+        ${t.league ? `<span class="w-chip">${esc(t.league)}</span>` : ""}
       </div>`;
     }
   }
 
   class ClubList extends ApiWidget {
+    badHint() {
+      return "部活のアドレスを指定してね (例: /api/bukatsu)";
+    }
+    // 単一 (/api/bukatsu/kitaku) は一覧の1行と同じ見た目でよい
+    renderOne(club) {
+      return this.renderItem(club);
+    }
     renderItem(club) {
       const chip = club.category
         ? `<span class="w-chip">${esc(club.category)}</span>`
@@ -196,21 +251,6 @@
         <strong>${esc(club.name)}</strong>
         ${chip}
       </div>`;
-    }
-
-    render(data) {
-      const col = this.applyColor();
-      // リスト (/api/bukatsu) でも1件 (/api/bukatsu/kitaku) でも使える
-      if (data && !Array.isArray(data) && data.name) {
-        return `<div class="w-box">${this.titleBand(col)}${this.renderItem(data)}</div>`;
-      }
-      if (!Array.isArray(data)) {
-        return errorBox("部活のアドレスを指定してね (例: /api/bukatsu)");
-      }
-      if (data.length === 0) {
-        return `<div class="w-box">${this.titleBand(col)}0件でした。アドレスの条件を変えてみよう。</div>`;
-      }
-      return `<div class="w-box">${this.titleBand(col)}${data.map((c) => this.renderItem(c)).join("")}</div>`;
     }
   }
 
