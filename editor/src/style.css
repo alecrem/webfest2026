@@ -143,3 +143,21 @@ body.dragging { user-select: none; }
   white-space: pre-wrap;
   word-break: break-all;
 }
+
+/* コード中の16進カラーの隣に出る色スウォッチ (クリックで色ピッカー) */
+.cm-color-swatch {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  padding: 0;
+  margin: 0 3px 0 0;
+  vertical-align: middle;
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  border-radius: 3px;
+  background: none;
+  cursor: pointer;
+}
+.cm-color-swatch::-webkit-color-swatch-wrapper { padding: 0; }
+.cm-color-swatch::-webkit-color-swatch { border: none; border-radius: 2px; }
+.cm-color-swatch::-moz-color-swatch { border: none; border-radius: 2px; }
