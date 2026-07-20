@@ -24,14 +24,14 @@ function expectValidTeams(teams: Team[]) {
 }
 
 describe("データ整合性", () => {
-  it("ポケモン: 151匹、id 1〜151、日本語名とプロキシのスプライトURL", () => {
-    expect(pokemon).toHaveLength(151);
+  it("ポケモン: 1025匹、id 1〜1025、日本語名とプロキシのスプライトURL", () => {
+    expect(pokemon).toHaveLength(1025);
     for (const p of pokemon) {
       expect(p.nameJa, p.name).not.toBe(p.name);
       expect(p.sprite).toBe(`/img/pokemon/${p.id}.png`);
     }
     expect(pokemon.map((p) => p.id)).toEqual(
-      Array.from({ length: 151 }, (_, i) => i + 1),
+      Array.from({ length: 1025 }, (_, i) => i + 1),
     );
   });
 

@@ -1,4 +1,4 @@
-// PokéAPI から第1世代 (151匹) のデータを取得して data/pokemon.json を生成する。
+// PokéAPI から全国図鑑 (1025匹) のデータを取得して data/pokemon.json を生成する。
 // 画像は落とさない: スプライトは実行時に /img/pokemon/:id.png のプロキシが
 // 必要な分だけ取得する (数を増やしてもビルドが重くならない)。
 // 生成物はコミットしない: `pnpm compose-data` でいつでも再現できる。
@@ -8,7 +8,8 @@ import { fileURLToPath } from "node:url";
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const DATA_FILE = path.join(root, "data/pokemon.json");
-const COUNT = 151;
+// PokéAPI にある最大の全国図鑑番号。ここを超えると 404 になる。
+const COUNT = 1025;
 
 const TYPE_JA = {
   normal: "ノーマル",
@@ -57,6 +58,8 @@ async function fetchOne(id) {
   };
 }
 
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
 const all = [];
 const BATCH = 10;
 for (let start = 1; start <= COUNT; start += BATCH) {
@@ -66,6 +69,8 @@ for (let start = 1; start <= COUNT; start += BATCH) {
   );
   all.push(...(await Promise.all(ids.map(fetchOne))));
   process.stdout.write(`\r${all.length}/${COUNT}`);
+  // 1000匹超をまとめて取るので、ロット間に少し待ってAPIに優しくする。
+  if (start + BATCH <= COUNT) await sleep(150);
 }
 
 all.sort((a, b) => a.id - b.id);

@@ -122,10 +122,10 @@ describe("widgets", () => {
   });
 
   it("404 のときはサーバーの hint を見せる", async () => {
-    stubFetch({ error: "見つかりませんでした", hint: "1〜151だよ" }, 404);
+    stubFetch({ error: "見つかりませんでした", hint: "1〜1025だよ" }, 404);
     const el = await mount("poke-card", "/api/pokemon/999");
     expect(el.innerHTML).toContain("404");
-    expect(el.innerHTML).toContain("1〜151だよ");
+    expect(el.innerHTML).toContain("1〜1025だよ");
   });
 
   it("title 属性はカードの中に見出しとして入る (poke-card)", async () => {
