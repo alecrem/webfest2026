@@ -91,9 +91,9 @@ describe("ids でまとめて取得", () => {
 });
 
 describe("GET /api/pokemon", () => {
-  it("151匹をサマリー項目で返す", async () => {
+  it("1025匹をサマリー項目で返す", async () => {
     const { body } = await get("/api/pokemon");
-    expect(body).toHaveLength(151);
+    expect(body).toHaveLength(1025);
     expect(body[24]).toMatchObject({ id: 25, nameJa: "ピカチュウ" });
     expect(body[0]).not.toHaveProperty("types");
   });
@@ -101,7 +101,7 @@ describe("GET /api/pokemon", () => {
   it("日本語のタイプ名で絞り込める", async () => {
     const { body } = await get("/api/pokemon?type=ほのお");
     expect(body.length).toBeGreaterThan(0);
-    expect(body.length).toBeLessThan(151);
+    expect(body.length).toBeLessThan(1025);
   });
 
   it("id・英語名・日本語名のどれでも見つかる", async () => {
@@ -114,7 +114,7 @@ describe("GET /api/pokemon", () => {
   });
 
   it("存在しなければ hint 付きで 404", async () => {
-    const { res, body } = await get("/api/pokemon/999");
+    const { res, body } = await get("/api/pokemon/9999");
     expect(res.status).toBe(404);
     expect(body.hint).toBeTruthy();
   });

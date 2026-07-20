@@ -22,11 +22,11 @@ describe("スプライトプロキシのコア (spriteResponse)", () => {
 
   it("範囲外や不正な名前は upstream に触れず 404", async () => {
     const fetchImpl = stubFetch();
-    for (const file of ["999.png", "0.png", "evil.png", "25.gif", undefined]) {
+    for (const file of ["1026.png", "0.png", "evil.png", "25.gif", undefined]) {
       const res = await spriteResponse(file, fetchImpl);
       expect(res.status, String(file)).toBe(404);
       const body = (await res.json()) as { hint: string };
-      expect(body.hint).toContain("151");
+      expect(body.hint).toContain("1025");
     }
     expect(fetchImpl).not.toHaveBeenCalled();
   });

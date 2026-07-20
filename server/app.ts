@@ -114,7 +114,7 @@ export function createApp() {
       (p) => String(p.id) === key || p.name === key || p.nameJa === key,
     );
     if (!found) {
-      return notFound(c, "番号 (1〜151) か英語名。例: /api/pokemon/25");
+      return notFound(c, "番号 (1〜1025) か英語名。例: /api/pokemon/25");
     }
     return json(c, found);
   });

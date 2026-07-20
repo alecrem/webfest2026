@@ -4,7 +4,7 @@
 // Cloudflare は edge の Cache API、Node 開発サーバーは都度取得。
 const UPSTREAM =
   "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon";
-const MAX_ID = 151;
+const MAX_ID = 1025;
 
 function errorJson(body: unknown, status: number): Response {
   return new Response(JSON.stringify(body), {
