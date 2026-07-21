@@ -100,6 +100,13 @@ pnpm deploy          # = pnpm build && wrangler pages deploy
 - `nodejs_compat` は不要 (実行時に `node:*` を使わない)。設定は
   [wrangler.toml](wrangler.toml)。
 
+## 授業資料
+
+- [docs/recipes.md](docs/recipes.md) — レシピ集 (生徒に配る。難易度順に
+  「1行変えると結果が変わる」例をまとめたもの)。
+- [docs/lesson-plan.md](docs/lesson-plan.md) — 40分の進行台本 (時間配分と
+  デモの手順)。
+
 ## 授業の前に
 
 - [data/bukatsu.json](data/bukatsu.json) が学校の部活と合っているか確認する。
