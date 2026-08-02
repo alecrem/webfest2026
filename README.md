@@ -102,8 +102,12 @@ pnpm deploy          # = pnpm build && wrangler pages deploy
 
 ## 授業資料
 
-- [docs/recipes.md](docs/recipes.md) — レシピ集 (生徒に配る。難易度順に
-  「1行変えると結果が変わる」例をまとめたもの)。
+- [public/recipes.html](public/recipes.html) — レシピ集 (生徒に配る。難易度順に
+  「1行変えると結果が変わる」例をまとめた印刷用HTML)。デプロイ後は `/recipes`
+  で開ける。配布用PDF ([public/recipes.pdf](public/recipes.pdf)、`/recipes.pdf`) も
+  同梱 (HTMLから書き出したスナップショット。HTMLを直したら再書き出しが必要)。
+- [public/slides.html](public/slides.html) — 授業用スライド。デプロイ後は
+  `/slides` で開ける。
 - [docs/lesson-plan.md](docs/lesson-plan.md) — 40分の進行台本 (時間配分と
   デモの手順)。
 
