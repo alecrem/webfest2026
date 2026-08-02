@@ -54,19 +54,22 @@
     padding: 0.4em 0.9em; border-radius: 999px;
   }
 
-  /* 番号つきの流れ (アジェンダ・手順) */
-  ul.flow { list-style: none; margin-top: 0.6em; max-width: 18em; width: 100%; }
-  ul.flow li {
-    display: flex; align-items: center; gap: 0.6em;
-    font-size: clamp(18px, 3.6vmin, 34px);
-    padding: 0.35em 0; text-align: left;
+  /* 番号つきの流れ (アジェンダ) — 1行ずつ、時間は右そろえ */
+  ul.flow {
+    list-style: none; margin-top: 0.8em;
+    display: grid; grid-template-columns: auto auto auto;
+    align-items: center; gap: 0.55em 1.6em;
+    width: max-content; max-width: 92vw;
+    font-size: clamp(16px, 3.4vmin, 32px);
   }
+  ul.flow li { display: contents; }
   ul.flow .n {
-    flex: none; width: 1.9em; height: 1.9em; border-radius: 50%;
+    width: 1.9em; height: 1.9em; border-radius: 50%;
     background: var(--accent); color: #fff; font-weight: 700;
-    display: grid; place-items: center; font-size: 0.75em;
+    display: grid; place-items: center; font-size: 0.8em;
   }
-  ul.flow .t { color: var(--muted); font-size: 0.8em; margin-left: auto; white-space: nowrap; }
+  ul.flow .label { text-align: left; white-space: nowrap; }
+  ul.flow .t { color: var(--muted); font-size: 0.85em; white-space: nowrap; text-align: right; }
 
   /* フロント/バックの図 */
   .diagram {
@@ -160,10 +163,10 @@
     <h2>今日やること</h2>
     <p class="big">自分の <span class="accent">ウェブページ</span> を作って、<br>だれかに見せよう。</p>
     <ul class="flow">
-      <li><span class="n">1</span><span>フロント / バックの話</span><span class="t">5分</span></li>
-      <li><span class="n">2</span><span>みんなで1つ変えてみる</span><span class="t">10分</span></li>
-      <li><span class="n">3</span><span>じゆうにカスタマイズ</span><span class="t">20分</span></li>
-      <li><span class="n">4</span><span>見せ合う</span><span class="t">5分</span></li>
+      <li><span class="n">1</span><span class="label">フロントエンドとバックエンド</span><span class="t">5分</span></li>
+      <li><span class="n">2</span><span class="label">みんなで1つ変えてみる</span><span class="t">10分</span></li>
+      <li><span class="n">3</span><span class="label">自由にカスタマイズ</span><span class="t">20分</span></li>
+      <li><span class="n">4</span><span class="label">見せ合う</span><span class="t">5分</span></li>
     </ul>
   </section>
 
