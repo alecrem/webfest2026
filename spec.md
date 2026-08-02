@@ -101,3 +101,7 @@ tests/      vitest: APIコントラクト + プロキシのコア + データ整
   入れ、テンプレートの外側 `<h2>` を廃止 (#5)。
 - 2026-07-20: 授業資料 (`docs/recipes.md` レシピ集、`docs/lesson-plan.md`
   40分の進行台本) を追加 (#3)。
+- 2026-08-03: レシピ集を印刷用HTML (`public/recipes.html`) に移行し `/recipes`
+  で配信。`docs/recipes.md` は削除して単一の元データにした。lesson-plan の
+  リンクを更新。配布用に HTML から書き出した PDF (`public/recipes.pdf`) も
+  同梱 (#18)。
