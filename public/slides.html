@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ウェブフェス — 授業スライド</title>
+<style>
+  :root {
+    --accent: #4355f9;
+    --ink: #1e293b;
+    --muted: #64748b;
+    --bg: #f7f9ff;
+    --card: #ffffff;
+    --code-bg: #0f172a;
+    --code-ink: #e2e8f0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: "Hiragino Sans", "Noto Sans JP", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    overflow: hidden;
+  }
+
+  .deck { height: 100vh; width: 100vw; position: relative; }
+
+  .slide {
+    position: absolute; inset: 0;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 6vmin 8vmin 10vmin;
+  }
+  .slide.active { display: flex; }
+
+  h1 { font-size: clamp(32px, 9vmin, 96px); line-height: 1.15; letter-spacing: 0.02em; }
+  h2 {
+    font-size: clamp(26px, 6.5vmin, 68px); line-height: 1.2;
+    color: var(--accent); margin-bottom: 0.5em;
+  }
+  p.lead { font-size: clamp(18px, 3.6vmin, 34px); color: var(--muted); margin-top: 0.6em; }
+  p.big  { font-size: clamp(20px, 4.2vmin, 40px); line-height: 1.5; }
+  .accent { color: var(--accent); }
+  .emoji { font-size: 1.15em; }
+
+  .url {
+    display: inline-block; margin-top: 1.2em;
+    font-family: ui-monospace, Menlo, monospace;
+    font-size: clamp(16px, 3.2vmin, 30px);
+    background: var(--accent); color: #fff;
+    padding: 0.4em 0.9em; border-radius: 999px;
+  }
+
+  /* 番号つきの流れ (アジェンダ) — 1行ずつ、時間は右そろえ */
+  ul.flow {
+    list-style: none; margin-top: 0.8em;
+    display: grid; grid-template-columns: auto auto auto;
+    align-items: center; gap: 0.55em 1.6em;
+    width: max-content; max-width: 92vw;
+    font-size: clamp(16px, 3.4vmin, 32px);
+  }
+  ul.flow li { display: contents; }
+  ul.flow .n {
+    width: 1.9em; height: 1.9em; border-radius: 50%;
+    background: var(--accent); color: #fff; font-weight: 700;
+    display: grid; place-items: center; font-size: 0.8em;
+  }
+  ul.flow .label { text-align: left; white-space: nowrap; }
+  ul.flow .t { color: var(--muted); font-size: 0.85em; white-space: nowrap; text-align: right; }
+
+  /* フロント/バックの図 */
+  .diagram {
+    display: flex; align-items: center; justify-content: center;
+    gap: clamp(12px, 3vmin, 40px); margin-top: 1em; flex-wrap: wrap; max-width: 100%;
+  }
+  .node {
+    background: var(--card); border: 3px solid var(--accent);
+    border-radius: 18px; padding: clamp(14px, 3vmin, 32px);
+    min-width: clamp(180px, 30vmin, 320px);
+  }
+  .node .label { font-size: clamp(20px, 4vmin, 38px); font-weight: 700; }
+  .node .sub { font-size: clamp(14px, 2.6vmin, 24px); color: var(--muted); margin-top: 0.3em; }
+  .arrows { display: flex; flex-direction: column; gap: 0.5em; color: var(--muted); }
+  .arrows .a { font-size: clamp(14px, 2.6vmin, 26px); white-space: nowrap; }
+  .arrows .a b { color: var(--accent); }
+
+  /* コード見本 */
+  pre {
+    background: var(--code-bg); color: var(--code-ink);
+    border-radius: 14px; padding: clamp(14px, 3vmin, 28px);
+    font-family: ui-monospace, Menlo, monospace;
+    font-size: clamp(15px, 3vmin, 30px); line-height: 1.5;
+    text-align: left; margin-top: 0.8em; max-width: 100%; overflow-x: auto;
+  }
+  pre .hl { color: #fde047; font-weight: 700; }
+  pre .cm { color: #64748b; }
+
+  /* キーやボタンの見せ方 */
+  kbd {
+    font-family: ui-monospace, Menlo, monospace; font-weight: 700;
+    background: #fff; border: 2px solid var(--ink); border-bottom-width: 4px;
+    border-radius: 8px; padding: 0.1em 0.5em; font-size: 0.9em;
+  }
+  .pill {
+    display: inline-block; background: #eef1ff; color: var(--accent);
+    border: 2px solid var(--accent); border-radius: 999px;
+    padding: 0.2em 0.7em; font-weight: 700; font-size: 0.9em;
+  }
+
+  /* アイコンの行 (自分のページを作ろう) */
+  .icons { display: flex; gap: clamp(16px, 5vmin, 60px); margin-top: 0.8em; flex-wrap: wrap; justify-content: center; }
+  .icons figure { display: flex; flex-direction: column; align-items: center; gap: 0.3em; }
+  .icons .ic { font-size: clamp(36px, 9vmin, 84px); }
+  .icons figcaption { font-size: clamp(15px, 2.8vmin, 26px); color: var(--muted); }
+
+  .hint-list { margin-top: 0.6em; }
+  .hint-list p { margin: 0.35em 0; }
+
+  /* フッター: ページ番号・進捗・操作ヒント */
+  .counter {
+    position: fixed; right: 2.2vmin; bottom: 1.8vmin;
+    font-size: clamp(12px, 2.2vmin, 20px); color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .kbdhint {
+    position: fixed; left: 2.2vmin; bottom: 1.8vmin;
+    font-size: clamp(11px, 2vmin, 16px); color: var(--muted);
+  }
+  .progress {
+    position: fixed; left: 0; bottom: 0; height: 6px;
+    background: var(--accent); width: 0; transition: width 0.2s ease;
+  }
+  .nav {
+    position: fixed; top: 50%; transform: translateY(-50%);
+    background: none; border: none; color: var(--accent);
+    font-size: clamp(28px, 6vmin, 56px); cursor: pointer;
+    opacity: 0.25; transition: opacity 0.2s; padding: 0.2em; line-height: 1;
+  }
+  .nav:hover { opacity: 0.8; }
+  #prev { left: 0.5vmin; }
+  #next { right: 0.5vmin; }
+
+  @media print {
+    .nav, .kbdhint, .progress { display: none; }
+    .slide { display: flex !important; position: relative; height: 100vh; page-break-after: always; }
+    body { overflow: visible; }
+  }
+</style>
+</head>
+<body>
+<div class="deck" id="deck">
+
+  <section class="slide">
+    <h1>🛠️ ウェブフェス</h1>
+    <p class="lead">フロントエンドとバックエンドを さわってみよう</p>
+    <span class="url">webfest2026.pages.dev</span>
+  </section>
+
+  <section class="slide">
+    <h2>今日やること</h2>
+    <p class="big">自分の <span class="accent">ウェブページ</span> を作って、<br>だれかに見せよう。</p>
+    <ul class="flow">
+      <li><span class="n">1</span><span class="label">フロントエンドとバックエンド</span><span class="t">5分</span></li>
+      <li><span class="n">2</span><span class="label">みんなで1つ変えてみる</span><span class="t">10分</span></li>
+      <li><span class="n">3</span><span class="label">自由にカスタマイズ</span><span class="t">20分</span></li>
+      <li><span class="n">4</span><span class="label">見せ合う</span><span class="t">5分</span></li>
+    </ul>
+  </section>
+
+  <section class="slide">
+    <h2>ウェブは2つの部分でできている</h2>
+    <div class="diagram">
+      <div class="node">
+        <div class="label">フロントエンド</div>
+        <div class="sub">見た目 (HTML)<br>今日さわるのはここ</div>
+      </div>
+      <div class="arrows">
+        <div class="a">アドレスを聞く <b>▶</b></div>
+        <div class="a"><b>◀</b> データをもらう</div>
+      </div>
+      <div class="node">
+        <div class="label">バックエンド</div>
+        <div class="sub">データを持っている<br>(ポケモン・部活・チーム)</div>
+      </div>
+    </div>
+    <p class="lead">覚える言葉は4つだけ:<br><span class="accent">フロントエンド・バックエンド・アドレス・データ</span></p>
+  </section>
+
+  <section class="slide">
+    <h2>一緒に1つ変えてみよう</h2>
+    <p class="big">まず開く:</p>
+    <span class="url">webfest2026.pages.dev</span>
+    <p class="lead">左にコード、右にプレビュー、下に「📡 通信」パネル。</p>
+  </section>
+
+  <section class="slide">
+    <h2>1. 番号を変えて保存</h2>
+    <pre><span class="cm">&lt;!-- 25 を 1 に --&gt;</span>
+&lt;poke-card src="/api/pokemon/<span class="hl">1</span>"&gt;&lt;/poke-card&gt;</pre>
+    <p class="big" style="margin-top:0.8em"><kbd>Ctrl</kbd> + <kbd>S</kbd> で <span class="accent">保存して表示</span></p>
+    <p class="lead">→ 右のプレビューがすぐ変わる</p>
+  </section>
+
+  <section class="slide">
+    <h2>2. 通信パネルを見る</h2>
+    <p class="big">下の <span class="pill">📡 このページの通信</span> を見る。</p>
+    <pre>GET <span class="hl">/api/pokemon/1</span>  →  200 OK</pre>
+    <p class="lead">これが、フロントエンドが バックエンドに送った<br><span class="accent">お願い</span> (アドレス) だよ。</p>
+  </section>
+
+  <section class="slide">
+    <h2>3. 色を変える</h2>
+    <p class="big"><code>color="#ffde00"</code> の横の<br><span class="accent">小さな四角</span>をクリック。</p>
+    <p class="lead">色を選ぶだけ。<br>16進の数字は 計算しなくていい。</p>
+  </section>
+
+  <section class="slide">
+    <h2>4. バックエンドをのぞいてみる</h2>
+    <p class="big">右上の <span class="pill">バックエンドをのぞく →</span></p>
+    <p class="lead">アドレスを書きかえて「送信」。<br>返ってくるデータを そのまま見られる。</p>
+  </section>
+
+  <section class="slide">
+    <h2>さあ、自分のページを</h2>
+    <p class="big"><span class="accent">紙のレシピ</span>を見ながら、<br>好きなものから 変えてみよう。</p>
+    <div class="icons">
+      <figure><span class="ic">⚡</span><figcaption>ポケモン</figcaption></figure>
+      <figure><span class="ic">🎨</span><figcaption>色</figcaption></figure>
+      <figure><span class="ic">🏫</span><figcaption>部活</figcaption></figure>
+      <figure><span class="ic">⚾</span><figcaption>応援チーム</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="slide">
+    <h2>困ったら</h2>
+    <div class="hint-list">
+      <p class="big">変わらない？ → <kbd>Ctrl</kbd> + <kbd>S</kbd> で保存</p>
+      <p class="big">ぐちゃぐちゃ？ → <span class="pill">🗑️ 最初にもどす</span></p>
+      <p class="big">赤い印 → タグの閉じ忘れかも</p>
+    </div>
+  </section>
+
+  <section class="slide">
+    <h2>見せ合おう 👀</h2>
+    <p class="big">何を変えた？ 一言ずつ紹介しよう。</p>
+    <p class="lead">つづきをやりたい人は <span class="pill">📋 HTMLをコピー</span><br>して、メモに保存しておこう。<br>(保存はこのブラウザだけなので消えることがある)</p>
+  </section>
+
+  <section class="slide">
+    <h1>たのしんで！ 🎉</h1>
+    <span class="url">webfest2026.pages.dev</span>
+  </section>
+
+</div>
+
+<button class="nav" id="prev" aria-label="前へ">‹</button>
+<button class="nav" id="next" aria-label="次へ">›</button>
+<div class="progress" id="progress"></div>
+<div class="counter" id="counter"></div>
+<div class="kbdhint">← → でスライドを送る</div>
+
+<script>
+  var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+  var counter = document.getElementById("counter");
+  var progress = document.getElementById("progress");
+  var i = 0;
+
+  function clamp(n) { return Math.max(0, Math.min(slides.length - 1, n)); }
+
+  function show(n) {
+    i = clamp(n);
+    slides.forEach(function (s, k) { s.classList.toggle("active", k === i); });
+    counter.textContent = (i + 1) + " / " + slides.length;
+    progress.style.width = ((i + 1) / slides.length * 100) + "%";
+    if (location.hash !== "#" + (i + 1)) history.replaceState(null, "", "#" + (i + 1));
+  }
+  function next() { show(i + 1); }
+  function prev() { show(i - 1); }
+
+  document.addEventListener("keydown", function (e) {
+    if (["ArrowRight", " ", "PageDown", "ArrowDown"].indexOf(e.key) !== -1) { e.preventDefault(); next(); }
+    else if (["ArrowLeft", "PageUp", "ArrowUp"].indexOf(e.key) !== -1) { e.preventDefault(); prev(); }
+    else if (e.key === "Home") { e.preventDefault(); show(0); }
+    else if (e.key === "End") { e.preventDefault(); show(slides.length - 1); }
+  });
+
+  document.getElementById("next").addEventListener("click", next);
+  document.getElementById("prev").addEventListener("click", prev);
+
+  // クリック/タップ: 右半分で次、左半分で前 (ナビ矢印は除く)
+  document.getElementById("deck").addEventListener("click", function (e) {
+    if (e.clientX > window.innerWidth / 2) next(); else prev();
+  });
+
+  var start = parseInt((location.hash || "").slice(1), 10);
+  show(isNaN(start) ? 0 : start - 1);
+</script>
+</body>
+</html>
