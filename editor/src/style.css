@@ -45,8 +45,9 @@ body {
 
 .spacer { flex: 1; }
 
-.api-link { color: #93c5fd; text-decoration: none; }
-.api-link:hover { text-decoration: underline; }
+.nav-links { display: flex; gap: 16px; }
+.nav-link { color: #93c5fd; text-decoration: none; white-space: nowrap; }
+.nav-link:hover { text-decoration: underline; }
 
 .split {
   flex: 1;
