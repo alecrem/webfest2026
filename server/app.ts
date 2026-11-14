@@ -15,22 +15,30 @@ function notFound(c: Context, hint: string) {
   return json(c, { error: "見つかりませんでした", hint }, 404);
 }
 
+type Filtered<T> = { ok: true; items: T[] } | { ok: false; hint: string };
+
+// 一覧の id から「id は a, b, c のどれか」という hint を作る。
+function idListHint<T>(items: T[], idOf: (item: T) => string): string {
+  return `id は ${items.map(idOf).join(", ")} のどれか`;
+}
+
 // カンマ区切りの ids で、生徒が書いた順に取り出す。未知の id は無視する。
 // 別の競技の id などヒットしないものは自然に除かれる (= 同じ endpoint 内だけ)。
+// どれも見つからなければ hint を返す (= /:id と同じ案内)。
 function pickByIds<T>(
   items: T[],
   idsParam: string,
   idOf: (item: T) => string | number,
-): T[] {
-  return idsParam
+  hint: string,
+): Filtered<T> {
+  const picked = idsParam
     .split(",")
     .map((s) => s.trim())
     .filter(Boolean)
     .map((id) => items.find((item) => String(idOf(item)) === id))
     .filter((item): item is T => item !== undefined);
+  return picked.length > 0 ? { ok: true, items: picked } : { ok: false, hint };
 }
-
-type Filtered<T> = { ok: true; items: T[] } | { ok: false; hint: string };
 
 // 絞り込み。何もヒットしなければ、使える値をデータから集めて hint にする
 // (生徒が ?type=炎 のように書いたとき、[] だけでは間違いに気づけないため)。
@@ -60,22 +68,28 @@ function respondFiltered<T>(
 }
 
 function teamRoutes(app: Hono, base: string, teams: Team[]) {
+  const idHint = idListHint(teams, (t) => t.id);
   app.get(`${base}/teams`, (c) => {
     const ids = c.req.query("ids");
-    if (ids) return json(c, pickByIds(teams, ids, (t) => t.id));
     return respondFiltered(
       c,
-      filterByParam(teams, "league", c.req.query("league"), (t) => [t.league]),
+      ids
+        ? pickByIds(teams, ids, (t) => t.id, idHint)
+        : filterByParam(teams, "league", c.req.query("league"), (t) => [
+            t.league,
+          ]),
     );
   });
   app.get(`${base}/teams/:id`, (c) => {
     const team = teams.find((t) => t.id === c.req.param("id"));
-    if (!team) {
-      return notFound(c, `id は ${teams.map((t) => t.id).join(", ")} のどれか`);
-    }
-    return json(c, team);
+    return team ? json(c, team) : notFound(c, idHint);
   });
 }
+
+const clubIdHint = idListHint(clubs, (x) => x.id);
+const pokemonIdHint = "番号 (1〜1025) か英語名。例: /api/pokemon/25";
+// ?ids= は番号だけを受け付ける (英語名は不可)。
+const pokemonIdsHint = "番号をカンマ区切りで (1〜1025)。例: ?ids=25,7";
 
 export function createApp() {
   const app = new Hono();
@@ -109,27 +123,25 @@ export function createApp() {
 
   app.get("/api/bukatsu", (c) => {
     const ids = c.req.query("ids");
-    if (ids) return json(c, pickByIds(clubs, ids, (x) => x.id));
     return respondFiltered(
       c,
-      filterByParam(clubs, "category", c.req.query("category"), (x) => [
-        x.category,
-      ]),
+      ids
+        ? pickByIds(clubs, ids, (x) => x.id, clubIdHint)
+        : filterByParam(clubs, "category", c.req.query("category"), (x) => [
+            x.category,
+          ]),
     );
   });
 
   app.get("/api/bukatsu/:id", (c) => {
     const club = clubs.find((x) => x.id === c.req.param("id"));
-    if (!club) {
-      return notFound(c, `id は ${clubs.map((x) => x.id).join(", ")} のどれか`);
-    }
-    return json(c, club);
+    return club ? json(c, club) : notFound(c, clubIdHint);
   });
 
   app.get("/api/pokemon", (c) => {
     const ids = c.req.query("ids");
     const result: Filtered<Pokemon> = ids
-      ? { ok: true, items: pickByIds(pokemon, ids, (p) => p.id) }
+      ? pickByIds(pokemon, ids, (p) => p.id, pokemonIdsHint)
       : filterByParam(pokemon, "type", c.req.query("type"), (p) => p.types);
     return respondFiltered(c, result, (list) =>
       list.map(({ id, name, nameJa, sprite }) => ({ id, name, nameJa, sprite })),
@@ -141,10 +153,7 @@ export function createApp() {
     const found = pokemon.find(
       (p) => String(p.id) === key || p.name === key || p.nameJa === key,
     );
-    if (!found) {
-      return notFound(c, "番号 (1〜1025) か英語名。例: /api/pokemon/25");
-    }
-    return json(c, found);
+    return found ? json(c, found) : notFound(c, pokemonIdHint);
   });
 
   teamRoutes(app, "/api/npb", npbTeams);
