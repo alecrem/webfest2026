@@ -77,16 +77,20 @@ describe("ids でまとめて取得", () => {
     expect(body[0]).not.toHaveProperty("types");
   });
 
-  it("NPB: 書いた順に返し、別競技 (Jリーグ) の id はヒットしない", async () => {
+  it("NPB: 書いた順に返す", async () => {
     const { body } = await get("/api/npb/teams?ids=giants,tigers");
     expect(body.map((t: { id: string }) => t.id)).toEqual(["giants", "tigers"]);
-    const { body: crossed } = await get("/api/npb/teams?ids=kashima");
-    expect(crossed).toEqual([]);
   });
 
-  it("どれも見つからなければ空配列", async () => {
-    const { body } = await get("/api/bukatsu?ids=nope1,nope2");
-    expect(body).toEqual([]);
+  it.each([
+    ["/api/bukatsu?ids=no,tampoco", "kitaku"],
+    ["/api/pokemon?ids=0,9999", "番号"],
+    // 別競技 (Jリーグ) の id はヒットしない
+    ["/api/npb/teams?ids=kashima", "tigers"],
+  ])("どれも見つからなければ hint 付き 404: %s", async (path, hint) => {
+    const { res, body } = await get(path);
+    expect(res.status).toBe(404);
+    expect(body.hint).toContain(hint);
   });
 });
 
@@ -143,6 +147,19 @@ describe("NPB と Jリーグ", () => {
     expect(teams.length).toBeGreaterThanOrEqual(18);
     const { body } = await get(`/api/jleague/teams/${teams[0].id}`);
     expect(body.id).toBe(teams[0].id);
+  });
+});
+
+describe("存在しない値で絞り込むと hint 付き 404", () => {
+  it.each([
+    ["/api/pokemon?type=チーズ", "ほのお"],
+    ["/api/bukatsu?category=チーズ部", "運動部"],
+    ["/api/npb/teams?league=チーズ・リーグ", "セ・リーグ"],
+    ["/api/jleague/teams?league=J1", "league では絞り込めません"],
+  ])("%s → hint に「%s」", async (path, hint) => {
+    const { res, body } = await get(encodeURI(path));
+    expect(res.status).toBe(404);
+    expect(body.hint).toContain(hint);
   });
 });
 
