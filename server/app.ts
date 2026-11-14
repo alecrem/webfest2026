@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import type { Context } from "hono";
 import { clubs, jleagueTeams, npbTeams, pokemon } from "./data";
-import type { Team } from "./data";
+import type { Pokemon, Team } from "./data";
 import { explorerHtml } from "./explorer";
 
 // 生徒がURLをブラウザで直接開くことも想定して、JSONは整形して返す。
@@ -30,12 +30,43 @@ function pickByIds<T>(
     .filter((item): item is T => item !== undefined);
 }
 
+type Filtered<T> = { ok: true; items: T[] } | { ok: false; hint: string };
+
+// 絞り込み。何もヒットしなければ、使える値をデータから集めて hint にする
+// (生徒が ?type=炎 のように書いたとき、[] だけでは間違いに気づけないため)。
+function filterByParam<T>(
+  items: T[],
+  param: string,
+  value: string | undefined,
+  valuesOf: (item: T) => (string | undefined)[],
+): Filtered<T> {
+  if (!value) return { ok: true, items };
+  const matches = items.filter((item) => valuesOf(item).includes(value));
+  if (matches.length > 0) return { ok: true, items: matches };
+  const valid = [...new Set(items.flatMap(valuesOf))].filter(Boolean);
+  const hint =
+    valid.length > 0
+      ? `${param} は ${valid.join(", ")} のどれか`
+      : `${param} では絞り込めません`;
+  return { ok: false, hint };
+}
+
+function respondFiltered<T>(
+  c: Context,
+  result: Filtered<T>,
+  present: (items: T[]) => unknown = (items) => items,
+) {
+  return result.ok ? json(c, present(result.items)) : notFound(c, result.hint);
+}
+
 function teamRoutes(app: Hono, base: string, teams: Team[]) {
   app.get(`${base}/teams`, (c) => {
     const ids = c.req.query("ids");
     if (ids) return json(c, pickByIds(teams, ids, (t) => t.id));
-    const league = c.req.query("league");
-    return json(c, league ? teams.filter((t) => t.league === league) : teams);
+    return respondFiltered(
+      c,
+      filterByParam(teams, "league", c.req.query("league"), (t) => [t.league]),
+    );
   });
   app.get(`${base}/teams/:id`, (c) => {
     const team = teams.find((t) => t.id === c.req.param("id"));
@@ -79,10 +110,11 @@ export function createApp() {
   app.get("/api/bukatsu", (c) => {
     const ids = c.req.query("ids");
     if (ids) return json(c, pickByIds(clubs, ids, (x) => x.id));
-    const category = c.req.query("category");
-    return json(
+    return respondFiltered(
       c,
-      category ? clubs.filter((x) => x.category === category) : clubs,
+      filterByParam(clubs, "category", c.req.query("category"), (x) => [
+        x.category,
+      ]),
     );
   });
 
@@ -96,14 +128,10 @@ export function createApp() {
 
   app.get("/api/pokemon", (c) => {
     const ids = c.req.query("ids");
-    const type = c.req.query("type");
-    const list = ids
-      ? pickByIds(pokemon, ids, (p) => p.id)
-      : type
-        ? pokemon.filter((p) => p.types.includes(type))
-        : pokemon;
-    return json(
-      c,
+    const result: Filtered<Pokemon> = ids
+      ? { ok: true, items: pickByIds(pokemon, ids, (p) => p.id) }
+      : filterByParam(pokemon, "type", c.req.query("type"), (p) => p.types);
+    return respondFiltered(c, result, (list) =>
       list.map(({ id, name, nameJa, sprite }) => ({ id, name, nameJa, sprite })),
     );
   });

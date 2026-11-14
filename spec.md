@@ -74,6 +74,9 @@ tests/      vitest: APIコントラクト + プロキシのコア + データ整
 - `GET /img/pokemon/:id.png` → スプライトのプロキシ (1〜151のみ、それ以外404)。
   画像は upstream (PokéAPI) からサーバー側で取得。Cloudflare では edge キャッシュ。
 - 404: `{ "error": "見つかりませんでした", "hint": "..." }`。
+- 絞り込み (`type` / `category` / `league`) で何もヒットしなければ404。`hint`
+  にはデータから集めた使える値を並べる (使える値がなければ「絞り込めません」)。
+  `ids` は対象外 (未知の id は無視して空配列もありうる)。
 
 ## 変更履歴
 
@@ -105,3 +108,6 @@ tests/      vitest: APIコントラクト + プロキシのコア + データ整
   で配信。`docs/recipes.md` は削除して単一の元データにした。lesson-plan の
   リンクを更新。配布用に HTML から書き出した PDF (`public/recipes.pdf`) も
   同梱 (#18)。
+- 2026-11-14: 存在しない値で絞り込むと (`?type=チーズ` など) `[]` ではなく
+  使える値を `hint` に並べた404を返すようにした。type / category / league
+  共通のヘルパー (#20)。

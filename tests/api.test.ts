@@ -146,6 +146,19 @@ describe("NPB と Jリーグ", () => {
   });
 });
 
+describe("存在しない値で絞り込むと hint 付き 404", () => {
+  it.each([
+    ["/api/pokemon?type=チーズ", "ほのお"],
+    ["/api/bukatsu?category=チーズ部", "運動部"],
+    ["/api/npb/teams?league=チーズ・リーグ", "セ・リーグ"],
+    ["/api/jleague/teams?league=J1", "league では絞り込めません"],
+  ])("%s → hint に「%s」", async (path, hint) => {
+    const { res, body } = await get(encodeURI(path));
+    expect(res.status).toBe(404);
+    expect(body.hint).toContain(hint);
+  });
+});
+
 describe("未知のルート", () => {
   it("/api への hint 付きの 404 JSON", async () => {
     const { res, body } = await get("/api/unknown");
