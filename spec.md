@@ -121,4 +121,5 @@ tests/      vitest: APIコントラクト + プロキシのコア + データ整
 - 2026-11-16: Dependabot のセキュリティアラート対応。wrangler を ^4.162.0 に
   上げ (miniflare 5 経由で sharp 0.35.5 / undici 7.30.1 に)、vitest を
   ^4.1.12 に。minimatch (htmlhint → glob 13 経由) は htmlhint が glob 14 に
-  上がるまで保留 (メジャー差の override は避ける、dev 専用)。
+  上がるまで保留 (メジャー差の override は避ける、dev 専用)。その下の
+  brace-expansion は範囲内なので 5.0.13 に更新。
